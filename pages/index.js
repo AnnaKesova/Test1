@@ -1,30 +1,47 @@
-import "../pages/index.css";
-import exampleJsonFile from "./Newdocument1.json";
+//import exampleJsonFile from "./Newdocument1.json";
 
 const popup = document.querySelector(".popup-form");
 const openPopup = document.querySelector(".popup-open");
 const closePopup = document.querySelector(".popup__close");
 const dropInput = document.querySelector(".form__item");
 const dropList = document.querySelector(".drop");
+const dropOption = dropList.querySelectorAll("option");
 
+// ajax запрос GET
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function () {
+  if (this.readyState == 4 && this.status == 200) {
+    const results = JSON.parse(this.responseText);
+    myFunction(results);
+  }
+};
+xhttp.open("GET", "Newdocument1.json", true);
+xhttp.send();
 
-let selectHTML = ""; // для перезаписывания массива
+let selectHTML = "";
 
-//функция для отображения списка
-function renderexampleJsonFile(exampleJsonFile) {
-  let results = exampleJsonFile.map((item) => item.city); // преобразуем в массив
-  results.sort()//соотируем по алфавиту
-//перебераем массив
-  results.forEach((item) => {  
-    selectHTML += `<option>${item}</option>`; // выводим значения в опшн, отображаем 
+function myFunction(data) {
+  const massiveResult = data.map((item) => item.city);
+  massiveResult.sort();
+  massiveResult.forEach((item) => {
+    selectHTML += `<option>${item}</option>`;
+    dropList.innerHTML = selectHTML;
   });
-  
 }
 
-renderexampleJsonFile(exampleJsonFile);
+dropInput.addEventListener("input", (e) => {
+  [...dropOption].forEach((item) => {
+    if (item.textContent.toLowerCase().includes(e.target.value.toLowerCase())) {
+      item.style.display = "block";
+    } else {
+      item.style.display = "none";
+    }
+  });
+});
 
-dropList.innerHTML = selectHTML; // отображаем товый массив в datalist
-console.log(typeof selectHTML)
+console.log(dropInput);
+console.log(dropList);
+console.log(dropOption);
 
 function popupopen() {
   popup.classList.add("popup_active"); //функция для открытия поп-апа
@@ -46,10 +63,8 @@ function dropSelect(e) {
   hide();
 }
 
-const dropOption = document.querySelectorAll("option")
-
 dropInput.addEventListener("input", (e) => {
-  [...dropOption].forEach(item => {
+  [...dropOption].forEach((item) => {
     if (item.textContent.toLowerCase().includes(e.target.value.toLowerCase())) {
       item.style.display = "block";
     } else {
@@ -58,10 +73,10 @@ dropInput.addEventListener("input", (e) => {
   });
 });
 
+
 openPopup.addEventListener("click", popupopen); // по клику присваевается класс открытия
 closePopup.addEventListener("click", popupclose);
 
 dropInput.addEventListener("focus", show, false);
 dropInput.addEventListener("blur", hide, false);
 dropList.addEventListener("click", dropSelect, false);
-
